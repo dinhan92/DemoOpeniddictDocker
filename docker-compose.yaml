@@ -1,0 +1,85 @@
+version: '3'
+services:
+  # envoygateway:
+  #   build: Envoy/
+  #   ports:
+  #     - "9901:9901"
+  #     - "10000:10000"
+  #     # - "10001:10001"
+  #   volumes:
+  #     - ./Envoy/envoy.yaml:/etc/envoy/envoy.yaml
+  #     # - ./Envoy/https.crt:/etc/ssl/certs/https.crt
+  #     # - ./Envoy/key.pem:/etc/ssl/certs/key.pem
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - SA_PASSWORD=OpeniddictServerDb!8989
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+  server:
+    build: ./
+    # privileged: true
+    ports:
+      - "5000:80"
+      # - "4999:443"
+    # network_mode: "host"
+    depends_on:
+      - sqlserver
+    environment:
+      # - ASPNETCORE_ENVIRONMENT=Development
+      # - ASPNETCORE_URLS=http://0.0.0.0:80
+      # ASPNETCORE_URLS: "https://+;http://+"
+      ASPNETCORE_URLS: "http://+"
+      # ASPNETCORE_HTTPS_PORT: "5000"
+      ASPNETCORE_ENVIRONMENT: "Development"
+    # networks:
+    #   - common_network
+    # volumes:
+    #   - ${APPDATA}\microsoft\UserSecrets\:/root/.microsoft/usersecrets
+    #   - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https/
+    #   # - ./../src/:/app/src/
+    # networks:
+    #   - some-net
+  api:
+    build: samples/Api/
+    # privileged: true
+    ports:
+      - "5001:80"
+      # - "5002:443"
+    # network_mode: "host"
+    depends_on:
+      - sqlserver
+      - server
+    environment:
+      # - ASPNETCORE_ENVIRONMENT=Development
+      # - ASPNETCORE_URLS=http://0.0.0.0:80
+      # ASPNETCORE_URLS: "https://+;http://+"
+      ASPNETCORE_URLS: "http://+"
+      # ASPNETCORE_HTTPS_PORT: "5001"
+      ASPNETCORE_ENVIRONMENT: "Development"
+    # networks:
+    #   - common_network
+    # volumes:
+    #   - ${APPDATA}\microsoft\UserSecrets\:/root/.microsoft/usersecrets
+    #   - ${USERPROFILE}\.aspnet\https:/root/.aspnet/https/
+    # networks:
+    #   - some-net
+# networks:
+#   some-net:
+#     driver: bridge
+# networks:
+#   some-net:
+#     external:
+#       name: network1_dataserver
+# networks:
+#   common_network:
+#     external: true
+  # sqlite3:
+  #   image: sqlite3
+  #   stdin_open: true
+  #   tty: true
+  #   volumes:
+  #     - db/:/root/db/
+
+      
